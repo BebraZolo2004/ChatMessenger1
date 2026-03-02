@@ -52,8 +52,22 @@ namespace ChatClientApp
 
                 Invoke(new Action(() =>
                 {
-                    txtChatHistory.AppendText(
-                        $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
+                    if (msg.FileData != null && msg.FileData.Length > 0)
+                    {
+                        string path = System.IO.Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                            msg.FileName);
+
+                        System.IO.File.WriteAllBytes(path, msg.FileData);
+
+                        txtChatHistory.AppendText(
+                            $"[{msg.Timestamp:HH:mm}] Получен файл: {msg.FileName}\r\n");
+                    }
+                    else
+                    {
+                        txtChatHistory.AppendText(
+                            $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
+                    }
                 }));
             }
         }
