@@ -64,6 +64,7 @@ public class ChatServer
             if (users.ContainsKey(client))
             {
                 string user = users[client];
+
                 users.Remove(client);
 
                 await Broadcast(new Message
