@@ -23,14 +23,14 @@ namespace ChatClientApp
         {
             try
             {
-                username = txtUsername.Text;
-
                 client = new TcpClient();
                 await client.ConnectAsync(txtIP.Text, int.Parse(txtPort.Text));
 
                 stream = client.GetStream();
 
-                Task.Run(ReceiveMessages);
+                MessageBox.Show("Подключено к серверу!");
+
+                _ = Task.Run(() => ReceiveMessages());
             }
             catch (Exception ex)
             {
@@ -40,35 +40,48 @@ namespace ChatClientApp
         private async Task ReceiveMessages()
         {
             byte[] buffer = new byte[4096];
+            StringBuilder sb = new StringBuilder();
 
             while (true)
             {
                 int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-
                 if (bytesRead == 0) break;
 
-                string json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                Message msg = JsonConvert.DeserializeObject<Message>(json);
+                sb.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
 
-                Invoke(new Action(() =>
+                while (sb.ToString().Contains("\n"))
                 {
-                    if (msg.FileData != null && msg.FileData.Length > 0)
-                    {
-                        string path = System.IO.Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                            msg.FileName);
+                    string fullMessage = sb.ToString();
+                    int index = fullMessage.IndexOf("\n");
 
-                        System.IO.File.WriteAllBytes(path, msg.FileData);
+                    string json = fullMessage.Substring(0, index);
+                    sb.Remove(0, index + 1);
 
-                        txtChatHistory.AppendText(
-                            $"[{msg.Timestamp:HH:mm}] Получен файл: {msg.FileName}\r\n");
-                    }
-                    else
+                    Message msg = JsonConvert.DeserializeObject<Message>(json);
+                    if (msg == null) continue;
+
+                    Invoke(new Action(() =>
                     {
-                        txtChatHistory.AppendText(
-                            $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
-                    }
-                }));
+                        if (msg.FileData != null && msg.FileData.Length > 0)
+                        {
+                            string path = System.IO.Path.Combine(
+                                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                                msg.FileName);
+
+                            System.IO.File.WriteAllBytes(path, msg.FileData);
+
+                            txtChatHistory.AppendText(
+                                $"[{msg.Timestamp:HH:mm}] Получен файл: {msg.FileName}\r\n");
+                        }
+                        else
+                        {
+                            txtChatHistory.AppendText(
+                                $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
+                        }
+
+                        ChatLogger.Save(msg);
+                    }));
+                }
             }
         }
 
@@ -84,7 +97,7 @@ namespace ChatClientApp
                 Receiver = lstUsers.SelectedItem?.ToString()
             };
 
-            string json = JsonConvert.SerializeObject(msg);
+            string json = JsonConvert.SerializeObject(msg) + "\n";
             byte[] data = Encoding.UTF8.GetBytes(json);
 
             await stream.WriteAsync(data, 0, data.Length);
@@ -108,7 +121,7 @@ namespace ChatClientApp
                     Receiver = lstUsers.SelectedItem?.ToString()
                 };
 
-                string json = JsonConvert.SerializeObject(msg);
+                string json = JsonConvert.SerializeObject(msg) + "\n";
                 byte[] data = Encoding.UTF8.GetBytes(json);
 
                 stream.Write(data, 0, data.Length);
