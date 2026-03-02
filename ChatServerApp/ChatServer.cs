@@ -10,6 +10,7 @@ public class ChatServer
 {
     private TcpListener listener;
     private List<TcpClient> clients = new List<TcpClient>();
+    private Dictionary<TcpClient, string> users = new Dictionary<TcpClient, string>();
 
     public async void Start(string ip, int port)
     {
@@ -27,6 +28,8 @@ public class ChatServer
 
     private async Task HandleClient(TcpClient client)
     {
+        string username = "";
+
         try
         {
             NetworkStream stream = client.GetStream();
@@ -40,13 +43,39 @@ public class ChatServer
                 string json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 Message msg = JsonConvert.DeserializeObject<Message>(json);
 
+                if (!users.ContainsKey(client))
+                {
+                    users[client] = msg.Author;
+
+                    await Broadcast(new Message
+                    {
+                        Author = "Server",
+                        Text = $"{msg.Author} вошёл в чат"
+                    }, null);
+                }
+
                 await Broadcast(msg, client);
             }
         }
         catch { }
 
-        clients.Remove(client);
-        client.Close(); 
+        finally
+        {
+            if (users.ContainsKey(client))
+            {
+                string user = users[client];
+                users.Remove(client);
+
+                await Broadcast(new Message
+                {
+                    Author = "Server",
+                    Text = $"{user} вышел из чата"
+                }, null);
+            }
+
+            clients.Remove(client);
+            client.Close();
+        }
     }
 
     private async Task Broadcast(Message message, TcpClient sender)
