@@ -80,6 +80,8 @@ public class ChatServer
 
     private async Task Broadcast(Message message, TcpClient sender)
     {
+        ChatLogger.Save(message);
+
         string json = JsonConvert.SerializeObject(message);
         byte[] data = Encoding.UTF8.GetBytes(json);
 

@@ -100,5 +100,17 @@ namespace ChatClientApp
                 stream.Write(data, 0, data.Length);
             }
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            var history = ChatLogger.Load();
+
+            foreach (var msg in history)
+            {
+                txtChatHistory.AppendText(
+                    $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
+            }
+
+        }
     }
 }
