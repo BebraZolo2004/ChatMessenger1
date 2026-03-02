@@ -33,6 +33,10 @@
             this.btnSend = new System.Windows.Forms.Button();
             this.lstUsers = new System.Windows.Forms.ListBox();
             this.btnFile = new System.Windows.Forms.Button();
+            this.btnConnect = new System.Windows.Forms.Button();
+            this.txtIP = new System.Windows.Forms.TextBox();
+            this.txtUsername = new System.Windows.Forms.TextBox();
+            this.txtPort = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // txtChatHistory
@@ -60,6 +64,7 @@
             this.btnSend.TabIndex = 5;
             this.btnSend.Text = "Отправить";
             this.btnSend.UseVisualStyleBackColor = true;
+            this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
             // lstUsers
             // 
@@ -77,12 +82,48 @@
             this.btnFile.TabIndex = 7;
             this.btnFile.Text = "Прикрепить файл";
             this.btnFile.UseVisualStyleBackColor = true;
+            this.btnFile.Click += new System.EventHandler(this.btnFile_Click);
+            // 
+            // btnConnect
+            // 
+            this.btnConnect.Location = new System.Drawing.Point(679, 444);
+            this.btnConnect.Name = "btnConnect";
+            this.btnConnect.Size = new System.Drawing.Size(109, 23);
+            this.btnConnect.TabIndex = 8;
+            this.btnConnect.Text = "Подключиться";
+            this.btnConnect.UseVisualStyleBackColor = true;
+            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
+            // 
+            // txtIP
+            // 
+            this.txtIP.Location = new System.Drawing.Point(152, 447);
+            this.txtIP.Name = "txtIP";
+            this.txtIP.Size = new System.Drawing.Size(100, 20);
+            this.txtIP.TabIndex = 9;
+            // 
+            // txtUsername
+            // 
+            this.txtUsername.Location = new System.Drawing.Point(298, 447);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(100, 20);
+            this.txtUsername.TabIndex = 10;
+            // 
+            // txtPort
+            // 
+            this.txtPort.Location = new System.Drawing.Point(12, 447);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new System.Drawing.Size(100, 20);
+            this.txtPort.TabIndex = 11;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 460);
+            this.ClientSize = new System.Drawing.Size(800, 542);
+            this.Controls.Add(this.txtPort);
+            this.Controls.Add(this.txtUsername);
+            this.Controls.Add(this.txtIP);
+            this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.btnFile);
             this.Controls.Add(this.lstUsers);
             this.Controls.Add(this.btnSend);
@@ -102,6 +143,10 @@
         private System.Windows.Forms.Button btnSend;
         private System.Windows.Forms.ListBox lstUsers;
         private System.Windows.Forms.Button btnFile;
+        private System.Windows.Forms.Button btnConnect;
+        private System.Windows.Forms.TextBox txtIP;
+        private System.Windows.Forms.TextBox txtUsername;
+        private System.Windows.Forms.TextBox txtPort;
     }
 }
 
