@@ -23,6 +23,8 @@ namespace ChatClientApp
         {
             try
             {
+                username = txtUsername.Text;
+
                 client = new TcpClient();
                 await client.ConnectAsync(txtIP.Text, int.Parse(txtPort.Text));
 
