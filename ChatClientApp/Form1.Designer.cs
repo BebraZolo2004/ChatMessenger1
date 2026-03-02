@@ -96,21 +96,21 @@
             // 
             // txtIP
             // 
-            this.txtIP.Location = new System.Drawing.Point(152, 447);
+            this.txtIP.Location = new System.Drawing.Point(12, 458);
             this.txtIP.Name = "txtIP";
             this.txtIP.Size = new System.Drawing.Size(100, 20);
             this.txtIP.TabIndex = 9;
             // 
             // txtUsername
             // 
-            this.txtUsername.Location = new System.Drawing.Point(298, 447);
+            this.txtUsername.Location = new System.Drawing.Point(303, 484);
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(100, 20);
             this.txtUsername.TabIndex = 10;
             // 
             // txtPort
             // 
-            this.txtPort.Location = new System.Drawing.Point(12, 447);
+            this.txtPort.Location = new System.Drawing.Point(12, 484);
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(100, 20);
             this.txtPort.TabIndex = 11;
