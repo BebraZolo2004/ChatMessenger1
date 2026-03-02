@@ -78,8 +78,6 @@ namespace ChatClientApp
                             txtChatHistory.AppendText(
                                 $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
                         }
-
-                        ChatLogger.Save(msg);
                     }));
                 }
             }
