@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using System.Windows.Forms;
 
 namespace ChatClientApp
@@ -16,6 +17,7 @@ namespace ChatClientApp
         public Form1()
         {
             InitializeComponent();
+            this.FormClosing += Form1_FormClosing;
 
         }
 
@@ -23,7 +25,13 @@ namespace ChatClientApp
         {
             try
             {
-                username = txtUsername.Text;
+                username = txtUsername.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    MessageBox.Show("Введите имя пользователя!");
+                    return;
+                }
 
                 client = new TcpClient();
                 await client.ConnectAsync(txtIP.Text, int.Parse(txtPort.Text));
@@ -31,6 +39,17 @@ namespace ChatClientApp
                 stream = client.GetStream();
 
                 MessageBox.Show("Подключено к серверу!");
+
+                var joinMessage = new Message
+                {
+                    Author = username,
+                    Text = "",
+                    Timestamp = DateTime.Now
+                };
+
+                string json = JsonConvert.SerializeObject(joinMessage) + "\n";
+                byte[] data = Encoding.UTF8.GetBytes(json);
+                await stream.WriteAsync(data, 0, data.Length);
 
                 _ = Task.Run(() => ReceiveMessages());
             }
@@ -44,41 +63,91 @@ namespace ChatClientApp
             byte[] buffer = new byte[4096];
             StringBuilder sb = new StringBuilder();
 
-            while (true)
+            while (client != null && client.Connected)
             {
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-                if (bytesRead == 0) break;
+                int bytesRead;
+
+                try
+                {
+                    bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                }
+                catch
+                {
+                    break;
+                }
+
+                if (bytesRead <= 0)
+                    continue;
 
                 sb.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
 
-                while (sb.ToString().Contains("\n"))
+                while (true)
                 {
-                    string fullMessage = sb.ToString();
-                    int index = fullMessage.IndexOf("\n");
+                    string data = sb.ToString();
+                    int index = data.IndexOf("\n");
 
-                    string json = fullMessage.Substring(0, index);
+                    if (index < 0)
+                        break;
+
+                    string json = data.Substring(0, index);
                     sb.Remove(0, index + 1);
 
-                    Message msg = JsonConvert.DeserializeObject<Message>(json);
-                    if (msg == null) continue;
+                    Message msg;
+
+                    try
+                    {
+                        msg = JsonConvert.DeserializeObject<Message>(json);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    if (msg == null)
+                        continue;
+
+                    if (!string.IsNullOrEmpty(msg.Text) && msg.Text.StartsWith("__USERLIST__"))
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            lstUsers.Items.Clear();
+
+                            string usersData = msg.Text.Replace("__USERLIST__", "");
+
+                            if (!string.IsNullOrWhiteSpace(usersData))
+                            {
+                                foreach (var user in usersData.Split('|'))
+                                {
+                                    if (!string.IsNullOrWhiteSpace(user))
+                                        lstUsers.Items.Add(user);
+                                }
+                            }
+                        }));
+
+                        continue;
+                    }
 
                     Invoke(new Action(() =>
                     {
-                        if (msg.FileData != null && msg.FileData.Length > 0)
+                        if (!string.IsNullOrEmpty(msg.Text))
                         {
-                            string path = System.IO.Path.Combine(
+                            txtChatHistory.AppendText(
+                                $"[{msg.Timestamp:HH:mm}] {(string.IsNullOrEmpty(msg.Author) ? "Unknown" : msg.Author)}: {msg.Text}\r\n");
+                        }
+                        else if (msg.FileData != null && msg.FileData.Length > 0)
+                        {
+                            string path = Path.Combine(
                                 Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                                msg.FileName);
+                                msg.FileName ?? "file.dat");
 
-                            System.IO.File.WriteAllBytes(path, msg.FileData);
+                            try
+                            {
+                                File.WriteAllBytes(path, msg.FileData);
+                            }
+                            catch { }
 
                             txtChatHistory.AppendText(
                                 $"[{msg.Timestamp:HH:mm}] Получен файл: {msg.FileName}\r\n");
-                        }
-                        else
-                        {
-                            txtChatHistory.AppendText(
-                                $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
                         }
                     }));
                 }
@@ -87,24 +156,42 @@ namespace ChatClientApp
 
         private async void btnSend_Click(object sender, EventArgs e)
         {
-            if (client == null || !client.Connected) return;
+            if (client == null || !client.Connected)
+            {
+                MessageBox.Show("Нет подключения к серверу!");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtMessage.Text))
+                return;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                MessageBox.Show("Имя пользователя не задано!");
+                return;
+            }
 
             Message msg = new Message()
             {
                 Author = username,
                 Text = txtMessage.Text,
-                Timestamp = DateTime.Now,
-                Receiver = lstUsers.SelectedItem?.ToString()
+                Timestamp = DateTime.Now
             };
 
-            string json = JsonConvert.SerializeObject(msg) + "\n";
-            byte[] data = Encoding.UTF8.GetBytes(json);
+            try
+            {
+                string json = JsonConvert.SerializeObject(msg) + "\n";
+                byte[] data = Encoding.UTF8.GetBytes(json);
 
-            await stream.WriteAsync(data, 0, data.Length);
+                await stream.WriteAsync(data, 0, data.Length);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
             txtMessage.Clear();
         }
-
         private void btnFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -138,6 +225,17 @@ namespace ChatClientApp
                     $"[{msg.Timestamp:HH:mm}] {msg.Author}: {msg.Text}\r\n");
             }
 
+        }
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                if (client != null)
+                {
+                    client.Close();
+                }
+            }
+            catch { }
         }
     }
 }
