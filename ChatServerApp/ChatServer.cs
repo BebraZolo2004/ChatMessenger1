@@ -83,7 +83,14 @@ public class ChatServer
                         await BroadcastUserList();
                     }
 
-                    await Broadcast(msg);
+                    if (!string.IsNullOrWhiteSpace(msg.Receiver))
+                    {
+                        await SendToUser(msg);
+                    }
+                    else
+                    {
+                        await Broadcast(msg);
+                    }
                 }
             }
         }
@@ -169,6 +176,27 @@ public class ChatServer
                 await client.GetStream().WriteAsync(data, 0, data.Length);
             }
             catch { }
+        }
+    }
+    private async Task SendToUser(Message message)
+    {
+        if (string.IsNullOrWhiteSpace(message.Receiver))
+            return;
+
+        string json = JsonConvert.SerializeObject(message) + "\n";
+        byte[] data = Encoding.UTF8.GetBytes(json);
+
+        foreach (var pair in users)
+        {
+            if (pair.Value == message.Receiver)
+            {
+                try
+                {
+                    await pair.Key.GetStream().WriteAsync(data, 0, data.Length);
+                }
+                catch { }
+                break;
+            }
         }
     }
 }

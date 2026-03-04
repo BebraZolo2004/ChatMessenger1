@@ -175,7 +175,8 @@ namespace ChatClientApp
             {
                 Author = username,
                 Text = txtMessage.Text,
-                Timestamp = DateTime.Now
+                Timestamp = DateTime.Now,
+                Receiver = lstUsers.SelectedItem?.ToString()
             };
 
             try
