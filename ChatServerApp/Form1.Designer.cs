@@ -1,4 +1,6 @@
-﻿namespace ChatServerApp
+﻿using System.Windows.Forms;
+
+namespace ChatServerApp
 {
     partial class Form1
     {
@@ -31,42 +33,78 @@
             this.txtPort = new System.Windows.Forms.TextBox();
             this.txtIP = new System.Windows.Forms.TextBox();
             this.btnStartServer = new System.Windows.Forms.Button();
+            this.lblIP = new System.Windows.Forms.Label();
+            this.lblPort = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // txtPort
             // 
-            this.txtPort.Location = new System.Drawing.Point(25, 234);
+            this.txtPort.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtPort.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtPort.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(72)))), ((int)(((byte)(83)))));
+            this.txtPort.Location = new System.Drawing.Point(40, 135);
             this.txtPort.Name = "txtPort";
-            this.txtPort.Size = new System.Drawing.Size(291, 20);
-            this.txtPort.TabIndex = 20;
+            this.txtPort.Size = new System.Drawing.Size(300, 25);
+            this.txtPort.TabIndex = 3;
             // 
             // txtIP
             // 
-            this.txtIP.Location = new System.Drawing.Point(25, 77);
+            this.txtIP.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtIP.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtIP.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(85)))), ((int)(((byte)(72)))), ((int)(((byte)(83)))));
+            this.txtIP.Location = new System.Drawing.Point(40, 65);
             this.txtIP.Name = "txtIP";
-            this.txtIP.Size = new System.Drawing.Size(291, 20);
-            this.txtIP.TabIndex = 18;
+            this.txtIP.Size = new System.Drawing.Size(300, 25);
+            this.txtIP.TabIndex = 1;
             // 
             // btnStartServer
             // 
-            this.btnStartServer.Location = new System.Drawing.Point(25, 334);
+            this.btnStartServer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(96)))), ((int)(((byte)(92)))), ((int)(((byte)(100)))));
+            this.btnStartServer.FlatAppearance.BorderSize = 0;
+            this.btnStartServer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStartServer.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnStartServer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.btnStartServer.Location = new System.Drawing.Point(40, 190);
             this.btnStartServer.Name = "btnStartServer";
-            this.btnStartServer.Size = new System.Drawing.Size(291, 23);
-            this.btnStartServer.TabIndex = 21;
-            this.btnStartServer.Text = "Подключить сервер";
-            this.btnStartServer.UseVisualStyleBackColor = true;
+            this.btnStartServer.Size = new System.Drawing.Size(300, 40);
+            this.btnStartServer.TabIndex = 4;
+            this.btnStartServer.Text = "Запустить сервер";
+            this.btnStartServer.UseVisualStyleBackColor = false;
             this.btnStartServer.Click += new System.EventHandler(this.btnStartServer_Click);
+            // 
+            // lblIP
+            // 
+            this.lblIP.AutoSize = true;
+            this.lblIP.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.lblIP.Location = new System.Drawing.Point(40, 40);
+            this.lblIP.Name = "lblIP";
+            this.lblIP.Size = new System.Drawing.Size(58, 13);
+            this.lblIP.TabIndex = 0;
+            this.lblIP.Text = "IP Address";
+            // 
+            // lblPort
+            // 
+            this.lblPort.AutoSize = true;
+            this.lblPort.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.lblPort.Location = new System.Drawing.Point(40, 110);
+            this.lblPort.Name = "lblPort";
+            this.lblPort.Size = new System.Drawing.Size(26, 13);
+            this.lblPort.TabIndex = 2;
+            this.lblPort.Text = "Port";
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 617);
-            this.Controls.Add(this.btnStartServer);
-            this.Controls.Add(this.txtPort);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
+            this.ClientSize = new System.Drawing.Size(400, 300);
+            this.Controls.Add(this.lblIP);
             this.Controls.Add(this.txtIP);
+            this.Controls.Add(this.lblPort);
+            this.Controls.Add(this.txtPort);
+            this.Controls.Add(this.btnStartServer);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Chat Server";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -77,6 +115,8 @@
         private System.Windows.Forms.TextBox txtPort;
         private System.Windows.Forms.TextBox txtIP;
         private System.Windows.Forms.Button btnStartServer;
+        private Label lblIP;
+        private Label lblPort;
     }
 }
 
